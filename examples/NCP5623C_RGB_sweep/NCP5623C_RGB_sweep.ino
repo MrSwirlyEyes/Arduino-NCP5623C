@@ -1,7 +1,9 @@
 /**
- * NCP5623C example: RGB Toggle
+ * NCP5623C example: RGB Sweep
  * 
- * Toggles the NCP5623C LEDs to cycle between RED, GREEN, and BLUE.
+ * Sweeps the NCP5623C LEDs to cycle between RED, GREEN, and BLUE using the gradual dim feature.
+ * 
+ * TODO: Add feature to time when gradual dim step will end
  */
 
 #include <NCP5623C.h>
@@ -10,27 +12,36 @@
 #define PIN_GREEN 0
 #define PIN_BLUE 1
 
-#define MAX_CURRENT 10
-
-#define DELAY 500
+#define DELAY 7465
 
 NCP5623C led = NCP5623C(PIN_RED,PIN_GREEN,PIN_BLUE);
 
 void setup() {
   led.initialize();
-
-//  led.setCurrent(MAX_CURRENT);
-
-  led.sweep();
 }
 
 void loop() {
-//  led.setColor(255,0,0); // Set MAX intensity RED
-//  delay(DELAY);
-//
-//  led.setColor(0,255,0); // Set MAX intensity GREEN
-//  delay(DELAY);
-//
-//  led.setColor(0,0,255); // Set MAX intensity BLUE
-//  delay(DELAY);
+  static uint8_t color = 0;
+
+  switch(color % 3) {
+    case(0): // RED
+      led.setColor(255,0,0);
+    break;
+    case(1): // GREEN
+      led.setColor(0,255,0);
+    break;
+    case(2): // BLUE
+      led.setColor(0,0,255);
+    break;
+  }
+
+  led.gradualSweep(255,255,RAMP_UPWARD); // Ramp UP
+
+  delay(DELAY);
+
+  led.gradualSweep(0,255,RAMP_DOWNWARD); // Ramp DOWN
+
+  delay(DELAY);
+
+  color++;
 }
